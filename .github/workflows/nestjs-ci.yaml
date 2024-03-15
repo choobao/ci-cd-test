@@ -1,22 +1,21 @@
 name: Nestjs CI
-# 깃 액션의 이름
 
-on: # 워크플로우의 이벤트를 담당함
+on:
   push:
-    branches: [main] # main에 push 됐을때 돌아감
+    branches: [main]
   pull_request:
-    branches: [main] # main에 PR 할때 돌아감
+    branches: [main]
 
-jobs: # 워크플로우의 기본 작동 단위, 들여쓰기로 구분된다.
+jobs:
   lint:
-    runs-on: ubuntu-latest #인스턴스 명시. 가동할 컴퓨터 서버
+    runs-on: ubuntu-latest
 
-    strategy: # 이 잡을 세가지 버전으로 돌리겠다!
+    strategy:
       fail-fast: false
       matrix:
         node-version: [16.x, 18.x, 20.x]
 
-    steps: #여러개 단계를 가질 수 있다. task들의 집합
+    steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
@@ -27,22 +26,22 @@ jobs: # 워크플로우의 기본 작동 단위, 들여쓰기로 구분된다.
       - name: Run lint
         run: npm run lint
 
-test:
-  needs: lint # 린트란? 프리티어의 상위레벨
-  runs-on: ubuntu-latest
-  strategy:
-    fail-fast: false
-    matrix:
-      node-version: [16.x, 18.x, 20.x]
-  steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Install dependencies
-      run: npm ci
-    - name: Run lint
-      run: npm run lint
-    - name: Run tests
-      run: npm test
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Run lint
+        run: npm run lint
+      - name: Run tests
+        run: npm test
